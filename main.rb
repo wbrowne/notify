@@ -1,42 +1,43 @@
 #!/usr/bin/env ruby
 require 'watir'
-
-def log (message)
-  puts "#{message}"
-end
+require 'thor'
 
 def notify (message)
-  log message.upcase
+  say message
   system 'osascript -e \'Display notification with title "%s"\'' % message
 rescue StandardError => e
 end
 
-def changes? (b)
-  url = 'https://doodle.com/poll/9tvdktysbrps8p9z'
+def changes? (b, url)
   b.goto url
-
-  log 'Page has loaded'
 
   selector = '#d-pollView article div div div ul li:nth-child(1) label div.d-optionDetails div button.d-button.d-countButton.d-medium.d-silentButton div div.d-buttonContent div.d-textContainer div'
   tag = b.element css: selector
   participants = tag.text
 
   if participants != '32/32'
-    notify 'A slot is available!'
+    say 'A slot is available!', :green
 
-    log 'Enter \'y\' to continue or anything else to quit.'
-    return gets.chomp.downcase != 'y'
+    input = ask 'Should I continue to watch? (y/n) ', :blue, default: 'n'
+    return input.downcase != 'y'
   else
-    log 'No luck this time.'
     return false
   end
 rescue StandardError => e
-  log "Error encountered: #{e.inspect}"
+  say "Error encountered: #{e.inspect}", :red
   return false
 end
 
-b = Watir::Browser.new :chrome
-until changes? b
-  log 'Sleeping...'
-  sleep 60
+class MyCLI < Thor
+  desc "watch URL", "URL to watch"
+  def watch(url)
+    b = Watir::Browser.new :chrome
+    until changes? b, url
+      say 'Sleeping...'
+      sleep 60
+    end
+  end
 end
+# ruby ./main.rb watch https://doodle.com/poll/9tvdktysbrps8p9z
+
+MyCLI.start(ARGV)

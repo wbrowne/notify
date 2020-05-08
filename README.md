@@ -16,7 +16,7 @@ For example - you would like to know when a certain product page no longer displ
 - Fetch dependencies:
 
 ```bash
-gem install watir
+bundle install
 ```
 
 ## Usage
