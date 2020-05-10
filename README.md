@@ -22,5 +22,5 @@ bundle install
 ## Usage
 
 ```bash
-ruby main.rb
+ruby ./main.rb watch https://doodle.com/poll/9tvdktysbrps8p9z
 ```

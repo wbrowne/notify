@@ -38,6 +38,5 @@ class MyCLI < Thor
     end
   end
 end
-# ruby ./main.rb watch https://doodle.com/poll/9tvdktysbrps8p9z
 
 MyCLI.start(ARGV)
