@@ -1,0 +1,8 @@
+{
+  "url": "https://www.logitech.com/de-de/product/hd-pro-webcam-c920s",
+  "criteria": {
+    "js_selector": "#section-product-hero > div.container.product-hero-container-top.js-productContainerTop > div.product-details-ctn.js-productDetailsCtn > div > div.product-details-block.cart.buyAtPartner.black > div > p.product-hero-availability-message",
+    "match": "Nicht auf Lager"
+  },
+  "interval": 60
+}

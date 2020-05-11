@@ -1,40 +1,63 @@
 #!/usr/bin/env ruby
 require 'watir'
 require 'thor'
+require 'json'
+
+Watir.default_timeout = 15
 
 def notify (message)
   say message
-  system 'osascript -e \'Display notification with title "%s"\'' % message
+  system 'say bingaling && osascript -e \'Display notification with title "%s"\'' % message
 rescue StandardError => e
 end
 
-def changes? (b, url)
-  b.goto url
+def changes? (browser, data)
+  url = data['url']
+  selector = data['criteria']['js_selector']
+  match = data['criteria']['match']
 
-  selector = '#d-pollView article div div div ul li:nth-child(1) label div.d-optionDetails div button.d-button.d-countButton.d-medium.d-silentButton div div.d-buttonContent div.d-textContainer div'
-  tag = b.element css: selector
-  participants = tag.text
+  browser.goto url
+  element = browser.element css: selector
 
-  if participants != '32/32'
-    say 'A slot is available!', :green
+  unless element.present?
+    say "Could not find element via selector (hidden=#{element.hidden?})", :red
 
-    input = ask 'Should I continue to watch? (y/n) ', :blue, default: 'n'
-    return input.downcase != 'y'
-  else
     return false
   end
+
+  if element.text == match
+    notify 'Matched!'
+    input = ask 'Should I continue to watch? (y/n) ', :blue, default: 'n'
+
+    return input.downcase != 'y'
+  end
+  false
+
+rescue Watir::Exception::UnknownObjectException => e
+  say "Could not find element: #{e.inspect}", :red
 rescue StandardError => e
-  say "Error encountered: #{e.inspect}", :red
+  say "Error occurred: #{e.inspect}", :red
   return false
 end
 
+def read_file(file_path)
+  file = File.open file_path
+
+  JSON.load file
+end
+
 class MyCLI < Thor
-  desc "watch URL", "URL to watch"
-  def watch(url)
+  desc "watch configuration", "JSON file to detail watch parameters"
+
+  def watch(file_path)
+    data = read_file file_path
+
     b = Watir::Browser.new :chrome
-    until changes? b, url
+
+    # wait and poll for changes
+    until changes? b, data
       say 'Sleeping...'
-      sleep 60
+      sleep data['interval']
     end
   end
 end
