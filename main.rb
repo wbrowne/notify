@@ -47,8 +47,11 @@ def read_file(file_path)
 end
 
 class MyCLI < Thor
-  desc "watch configuration", "JSON file to detail watch parameters"
+  def self.exit_on_failure?
+    true
+  end
 
+  desc "watcher <data.json>", "setup watcher using JSON file that defines watch parameters"
   def watch(file_path)
     data = read_file file_path
 

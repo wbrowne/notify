@@ -22,5 +22,21 @@ bundle install
 ## Usage
 
 ```bash
-ruby ./main.rb watch https://doodle.com/poll/9tvdktysbrps8p9z
+ruby ./main.rb watch data.json
+```
+
+```json
+{
+  "url": "<Some valid URL to watch>",
+  "criteria": {
+    "js_selector": "<The specific element you want to watch>",
+    "match": "<The string you DON't want to match against (poor naming I know - will fix)>"
+  },
+  "interval": 60
+}
+```
+
+Command helper:
+```bash
+ruby ./main.rb help watch 
 ```
