@@ -38,5 +38,5 @@ ruby ./main.rb watch data.json
 
 Command helper:
 ```bash
-ruby ./main.rb help watch 
+ruby ./main.rb help 
 ```
