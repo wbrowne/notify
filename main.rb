@@ -14,7 +14,7 @@ end
 def changes? (browser, data)
   url = data['url']
   selector = data['criteria']['js_selector']
-  match = data['criteria']['match']
+  matchCriteria = data['criteria']['match']
 
   browser.goto url
   element = browser.element css: selector
@@ -25,7 +25,7 @@ def changes? (browser, data)
     return false
   end
 
-  if element.text != match
+  if is_a_match? matchCriteria, element
     notify 'Matched!'
     input = ask 'Should I continue to watch? (y/n) ', :blue, default: 'n'
 
@@ -38,6 +38,14 @@ rescue Watir::Exception::UnknownObjectException => e
 rescue StandardError => e
   say "Error occurred: #{e.inspect}", :red
   return false
+end
+
+def is_a_match? (match, element)
+  if match['condition'] == 'ne'
+    return match['text'] != element.text
+  end
+
+  return match['text'] == element.text
 end
 
 def read_file(file_path)
