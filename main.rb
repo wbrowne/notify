@@ -25,7 +25,7 @@ def changes? (browser, data)
     return false
   end
 
-  if element.text == match
+  if element.text != match
     notify 'Matched!'
     input = ask 'Should I continue to watch? (y/n) ', :blue, default: 'n'
 
