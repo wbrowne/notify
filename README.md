@@ -4,9 +4,23 @@
 
 # Notify
 
-Notify is a ruby script that will periodically watch a web page and notify you based on changing web content
+Notify is a (very stupid) ruby script that will periodically watch a web page and notify you based on changing web content that you specify.
 
-For example - you would like to know when a certain product page no longer displays the text "Not in stock"
+For example - you would like to know when a certain product page no longer displays the text "Not in stock". IE you want a Logitech camera and don't want to spend all your free time refreshing the product page.
+
+```json
+{
+  "url": "https://www.logitech.com/de-de/product/hd-pro-webcam-c920s",
+  "criteria": {
+    "js_selector": "#section-product-hero > div.container.product-hero-container-top.js-productContainerTop > div.product-details-ctn.js-productDetailsCtn > div > div.product-details-block.cart.buyAtPartner.black > div > p.product-hero-availability-message",
+    "match": {
+      "condition": "ne",
+      "text": "Nicht auf Lager"
+    }
+  },
+  "interval": 60
+}
+```
 
 ## Installation
 
