@@ -6,12 +6,12 @@ require 'mail'
 
 Watir.default_timeout = 15
 
-def notify (message, notificationSettings)
+def notify (message, notification_config)
   say message
   system 'say bingaling'
-  send_macos_notification "Notify - Match Found!", notificationSettings['name']
+  send_macos_notification "Notify - Match Found!", notification_config['name']
 
-  send_email notificationSettings
+  send_email notification_config
 
 rescue StandardError => e
 end
@@ -20,24 +20,24 @@ def send_macos_notification (title, message)
   system "osascript -e 'Display notification \"#{message}\" with title \"#{title}\"'"
 end
 
-def send_email(notificationSettings)
-  serverSettings = notificationSettings['server']
+def send_email(notification_config)
+  server_config = notification_config['server']
 
   Mail.defaults do
     delivery_method :smtp, {
-        address: serverSettings['address'],
-        port: serverSettings['port'],
-        domain: serverSettings['domain'],
-        user_name: serverSettings['username'],
-        password: serverSettings['password'],
+        address: server_config['address'],
+        port: server_config['port'],
+        domain: server_config['domain'],
+        user_name: server_config['username'],
+        password: server_config['password'],
         authentication: :login,
         enable_starttls_auto: true
     }
   end
 
   mail = Mail.new do
-    to notificationSettings['to']
-    from notificationSettings['from']
+    to notification_config['to']
+    from notification_config['from']
     subject 'Test'
     body 'Test'
   end
@@ -61,9 +61,8 @@ def changes? (browser, config)
 
   if is_a_match? matchCriteria, element
     notify 'Matched!', config['notification']
-    input = ask 'Should I continue to watch? (y/n) ', :blue, default: 'n'
 
-    return input.downcase != 'y'
+    return true
   end
   false
 
@@ -82,7 +81,7 @@ def is_a_match? (match, element)
   return match['text'] == element.text
 end
 
-def read_file(file_path)
+def read_json_file(file_path)
   file = File.open file_path
 
   JSON.load file
@@ -96,7 +95,7 @@ class MyCLI < Thor
   desc "watch <config.json>", "setup watcher using JSON file that defines watch config"
 
   def watch(file_path = "config.json")
-    config = read_file file_path
+    config = read_json_file file_path
 
     b = Watir::Browser.new :chrome
 
