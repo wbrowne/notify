@@ -8,11 +8,16 @@ Watir.default_timeout = 15
 
 def notify (message, notificationSettings)
   say message
-  system 'say bingaling && osascript -e \'Display notification with title "%s"\'' % message
+  system 'say bingaling'
+  send_macos_notification "Notify - Match Found!", notificationSettings['name']
 
   send_email notificationSettings
 
 rescue StandardError => e
+end
+
+def send_macos_notification (title, message)
+  system "osascript -e 'Display notification \"#{message}\" with title \"#{title}\"'"
 end
 
 def send_email(notificationSettings)
@@ -24,7 +29,7 @@ def send_email(notificationSettings)
         port: serverSettings['port'],
         domain: serverSettings['domain'],
         user_name: serverSettings['username'],
-        password: serverSettings['password'], #ENV.fetch('EMAIL_PASSWORD'),
+        password: serverSettings['password'],
         authentication: :login,
         enable_starttls_auto: true
     }
@@ -71,7 +76,7 @@ end
 
 def is_a_match? (match, element)
   if match['condition'] == 'ne'
-    return match['text'] != element.text
+    return match['text'] == element.text
   end
 
   return match['text'] == element.text
