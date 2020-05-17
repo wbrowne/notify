@@ -2,19 +2,48 @@
 require 'watir'
 require 'thor'
 require 'json'
+require 'mail'
 
 Watir.default_timeout = 15
 
-def notify (message)
+def notify (message, notificationSettings)
   say message
   system 'say bingaling && osascript -e \'Display notification with title "%s"\'' % message
+
+  send_email notificationSettings
+
 rescue StandardError => e
 end
 
-def changes? (browser, data)
-  url = data['url']
-  selector = data['criteria']['js_selector']
-  matchCriteria = data['criteria']['match']
+def send_email(notificationSettings)
+  serverSettings = notificationSettings['server']
+
+  Mail.defaults do
+    delivery_method :smtp, {
+        address: serverSettings['address'],
+        port: serverSettings['port'],
+        domain: serverSettings['domain'],
+        user_name: serverSettings['username'],
+        password: serverSettings['password'], #ENV.fetch('EMAIL_PASSWORD'),
+        authentication: :login,
+        enable_starttls_auto: true
+    }
+  end
+
+  mail = Mail.new do
+    to notificationSettings['to']
+    from notificationSettings['from']
+    subject 'Test'
+    body 'Test'
+  end
+
+  mail.deliver
+end
+
+def changes? (browser, config)
+  url = config['url']
+  selector = config['criteria']['js_selector']
+  matchCriteria = config['criteria']['match']
 
   browser.goto url
   element = browser.element css: selector
@@ -26,7 +55,7 @@ def changes? (browser, data)
   end
 
   if is_a_match? matchCriteria, element
-    notify 'Matched!'
+    notify 'Matched!', config['notification']
     input = ask 'Should I continue to watch? (y/n) ', :blue, default: 'n'
 
     return input.downcase != 'y'
@@ -59,16 +88,17 @@ class MyCLI < Thor
     true
   end
 
-  desc "watcher <data.json>", "setup watcher using JSON file that defines watch parameters"
-  def watch(file_path)
-    data = read_file file_path
+  desc "watch <config.json>", "setup watcher using JSON file that defines watch config"
+
+  def watch(file_path = "config.json")
+    config = read_file file_path
 
     b = Watir::Browser.new :chrome
 
     # wait and poll for changes
-    until changes? b, data
+    until changes? b, config
       say 'Sleeping...'
-      sleep data['interval']
+      sleep config['interval']
     end
   end
 end
