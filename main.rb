@@ -71,8 +71,6 @@ rescue Watir::Exception::UnknownObjectException => e
 rescue StandardError => e
   say "Error occurred: #{e.inspect}", :red
   return false
-ensure
-  browser.close
 end
 
 def is_a_match? (match, element)
@@ -106,6 +104,7 @@ class MyCLI < Thor
       say 'Sleeping...'
       sleep config['interval']
     end
+    b.close
   end
 end
 
