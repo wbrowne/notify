@@ -38,8 +38,8 @@ def send_email(notification_config)
   mail = Mail.new do
     to notification_config['to']
     from notification_config['from']
-    subject 'Test'
-    body 'Test'
+    subject "Notify - Match Found for watcher \"#{notification_config['name']}\""
+    body "Go check it out #{notification_config['redirect']}"
   end
 
   mail.deliver
