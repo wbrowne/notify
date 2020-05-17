@@ -2,11 +2,10 @@
   <img src="logo.png" width="400">
 </p>
 
-# Notify
+Notify is a (very stupid) ruby script that will periodically visit a web page and notify you based on changing web content which you specify.
 
-Notify is a (very stupid) ruby script that will periodically watch a web page and notify you based on changing web content that you specify.
-
-For example - you would like to know when a certain product page no longer displays the text "Not in stock". IE you want a Logitech camera and don't want to spend all your free time refreshing the product page.
+For example - you would like to know when a certain product page no longer displays the text "Not in stock". 
+IE you want a Logitech camera and don't want to spend all your free time refreshing the product page.
 
 ```json
 {
@@ -19,7 +18,8 @@ For example - you would like to know when a certain product page no longer displ
     }
   },
   "interval": 60
-}
+},
+...
 ```
 
 ## Installation
@@ -36,17 +36,33 @@ bundle install
 ## Usage
 
 ```bash
-ruby ./main.rb watch data.json
+ruby ./main.rb watch config.json
 ```
 
 ```json
 {
-  "url": "<Some valid URL to watch>",
+  "url": "https://www.logitech.com/de-de/product/hd-pro-webcam-c920s",
   "criteria": {
-    "js_selector": "<The specific element you want to watch>",
-    "match": "<The string you DON't want to match against (poor naming I know - will fix)>"
+    "js_selector": "#section-product-hero > div.container.product-hero-container-top.js-productContainerTop > div.product-details-ctn.js-productDetailsCtn > div > div.product-details-block.cart.buyAtPartner.black > div > p.product-hero-availability-message",
+    "match": {
+      "condition": "ne",
+      "text": "Nicht auf Lager"
+    }
   },
-  "interval": 60
+  "interval": 60,
+  "notification": {
+    "name": "Logitech webcam stock check",
+    "from": "watcher@noti.fy",
+    "to": "desperateforalogitechwebcam@gmail.com",
+    "redirect": "https://www.logitech.com/de-de/product/hd-pro-webcam-c920s",
+    "server": {
+      "address": "smtp.notify.com",
+      "port": 587,
+      "domain": "mail.notify.com",
+      "username": "watcher@noti.fy",
+      "password": "$up@S3cu]Ur3"
+    }
+  }
 }
 ```
 
