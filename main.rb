@@ -75,7 +75,7 @@ end
 
 def is_a_match? (match, element)
   if match['condition'] == 'ne'
-    return match['text'] == element.text
+    return match['text'] != element.text
   end
 
   return match['text'] == element.text
